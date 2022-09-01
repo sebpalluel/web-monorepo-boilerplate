@@ -1,0 +1,35 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@boilerplate/gql-admin": ["libs/gql/admin/src/generated/index.ts"],
+      "@boilerplate/gql-user": ["libs/gql/user/src/generated/index.ts"],
+      "@boilerplate/hasura-adapter": ["libs/hasura/adapter/src/index.ts"],
+      "@boilerplate/hasura-fetcher": ["libs/hasura/fetcher/src/index.ts"],
+      "@boilerplate/hasura-utils": ["libs/hasura/utils/src/index.ts"],
+      "@boilerplate/logger": ["libs/logger/src/index.ts"],
+      "@boilerplate/next-auth": ["libs/next-auth/src/index.ts"],
+      "@boilerplate/test-utils-common": ["libs/test-utils/common/src/index.ts"],
+      "@boilerplate/test-utils-cypress": ["libs/test-utils/cypress/src/index.ts"],
+      "@boilerplate/test-utils-db": ["libs/test-utils/db/src/index.ts"],
+      "@boilerplate/test-utils-gql": ["libs/test-utils/gql/src/index.ts"],
+      "@boilerplate/utils": ["libs/utils/src/index.ts"],
+      "@web/*": ["apps/web/src/*"]
+    }
+  },
+  "include": [],
+  "exclude": ["node_modules", "tmp"]
+}

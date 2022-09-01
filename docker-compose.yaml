@@ -1,0 +1,105 @@
+version: '3.9'
+services:
+  hasura-engine:
+    container_name: hasura-engine
+    image: hasura/graphql-engine:v2.10.1
+    ports:
+      - '8080:8080'
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.local
+    environment:
+      HASURA_GRAPHQL_ENABLE_CONSOLE: 'false'
+      HASURA_GRAPHQL_DEV_MODE: 'true'
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: 'false'
+    networks:
+      - web
+      - db
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=web'
+      - 'traefik.http.routers.hasura-engine.rule=Host(`hasura-engine.postgres.test`)'
+    tty: true
+    restart: unless-stopped
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  hasura-console:
+    container_name: hasura-console
+    image: sebpalluel/hasura_cli_with_socat_and_curl:latest
+    # build:
+    #   context: ./hasura-console
+    #   dockerfile: Dockerfile
+    volumes:
+      - ./hasura-console:/usr/src/hasura
+    env_file:
+      - .env.local
+    environment:
+      HASURA_GRAPHQL_ADDRESS: 127.0.0.1
+      HASURA_RUN_CONSOLE: 'true'
+    ports:
+      - '9695:9695'
+      - '9693:9693'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - web
+      - db
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=web'
+      - 'traefik.http.services.hasura-console.loadbalancer.server.port=9695'
+      - 'traefik.http.routers.hasura-console.rule=Host(`hasura-console.postgres.test`)'
+    depends_on:
+      db:
+        condition: service_healthy
+    command: './start.sh'
+    restart: unless-stopped
+
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog
+    logging:
+      driver: 'none' # disable saving logs
+    ports:
+      - '1025:1025' # smtp server
+      - '8025:8025' # mailcatcher web interface
+    networks:
+      - web
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    env_file:
+      - .env.local
+    restart: on-failure
+
+  db:
+    container_name: db
+    image: postgres:13
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - db
+    restart: unless-stopped
+    env_file:
+      - .env.local
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+volumes:
+  db_data:
+  web_node_modules:
+  web_next:
+
+networks:
+  web:
+    driver: bridge
+  db:
+    driver: bridge

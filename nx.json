@@ -1,0 +1,86 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "npmScope": "boilerplate",
+  "affected": {
+    "defaultBase": "main"
+  },
+  "workspaceLayout": {
+    "appsDir": "apps",
+    "libsDir": "libs"
+  },
+  "implicitDependencies": {
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
+    ".eslintrc.json": "*"
+  },
+  "extends": "nx/presets/npm.json",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "cacheableOperations": [
+          "dev",
+          "serve",
+          "build",
+          "affected:build",
+          "postbuild",
+          "lint",
+          "lint:fix",
+          "affected:lint",
+          "workspace-lint",
+          "type-check",
+          "up",
+          "up-latest",
+          "push-release",
+          "gql",
+          "prebuild",
+          "format",
+          "format:check",
+          "format:write",
+          "test",
+          "affected:test",
+          "e2e",
+          "affected:e2e",
+          "clean"
+        ],
+        "parallel": true,
+        "accessToken": "TODO: YOUR_READ_ACCESS_TOKEN: https://nx.dev/nx-cloud/account/access-tokens",
+        "canTrackAnalytics": true,
+        "showUsageWarning": true
+      }
+    }
+  },
+  "namedInputs": {
+    "noMarkdown": ["!{projectRoot}/**/*.md"]
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["noMarkdown", "^noMarkdown"]
+    },
+    "test": {
+      "inputs": ["noMarkdown", "^noMarkdown"]
+    }
+  },
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "babel": true
+      }
+    },
+    "@nrwl/next": {
+      "application": {
+        "style": "@emotion/styled",
+        "linter": "eslint"
+      }
+    }
+  },
+  "defaultProject": "web",
+  "pluginsConfig": {
+    "@nrwl/js": {
+      "analyzeSourceFiles": true
+    }
+  }
+}
