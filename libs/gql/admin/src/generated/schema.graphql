@@ -604,6 +604,19 @@ enum accounts_update_column {
   userId
 }
 
+input accounts_updates {
+  """
+  increments the numeric columns with given value of the filtered values
+  """
+  _inc: accounts_inc_input
+
+  """
+  sets the columns of the filtered rows to the given values
+  """
+  _set: accounts_set_input
+  where: accounts_bool_exp!
+}
+
 """
 aggregate var_pop on columns
 """
@@ -899,6 +912,16 @@ type mutation_root {
   ): accounts
 
   """
+  update multiples rows of table: "accounts"
+  """
+  update_accounts_many(
+    """
+    updates to execute, in order
+    """
+    updates: [accounts_updates!]!
+  ): [accounts_mutation_response]
+
+  """
   update data of the table: "passwords"
   """
   update_passwords(
@@ -935,6 +958,16 @@ type mutation_root {
   ): passwords
 
   """
+  update multiples rows of table: "passwords"
+  """
+  update_passwords_many(
+    """
+    updates to execute, in order
+    """
+    updates: [passwords_updates!]!
+  ): [passwords_mutation_response]
+
+  """
   update data of the table: "sessions"
   """
   update_sessions(
@@ -959,6 +992,16 @@ type mutation_root {
     _set: sessions_set_input
     pk_columns: sessions_pk_columns_input!
   ): sessions
+
+  """
+  update multiples rows of table: "sessions"
+  """
+  update_sessions_many(
+    """
+    updates to execute, in order
+    """
+    updates: [sessions_updates!]!
+  ): [sessions_mutation_response]
 
   """
   update data of the table: "users"
@@ -987,6 +1030,16 @@ type mutation_root {
   ): users
 
   """
+  update multiples rows of table: "users"
+  """
+  update_users_many(
+    """
+    updates to execute, in order
+    """
+    updates: [users_updates!]!
+  ): [users_mutation_response]
+
+  """
   update data of the table: "verificationTokens"
   """
   update_verificationTokens(
@@ -1000,6 +1053,16 @@ type mutation_root {
     """
     where: verificationTokens_bool_exp!
   ): verificationTokens_mutation_response
+
+  """
+  update multiples rows of table: "verificationTokens"
+  """
+  update_verificationTokens_many(
+    """
+    updates to execute, in order
+    """
+    updates: [verificationTokens_updates!]!
+  ): [verificationTokens_mutation_response]
 }
 
 """
@@ -1387,6 +1450,19 @@ enum passwords_update_column {
   userId
 }
 
+input passwords_updates {
+  """
+  increments the numeric columns with given value of the filtered values
+  """
+  _inc: passwords_inc_input
+
+  """
+  sets the columns of the filtered rows to the given values
+  """
+  _set: passwords_set_input
+  where: passwords_bool_exp!
+}
+
 """
 aggregate var_pop on columns
 """
@@ -1437,7 +1513,7 @@ input passwords_variance_order_by {
 
 type query_root {
   """
-  fetch data from the table: "accounts"
+  An array relationship
   """
   accounts(
     """
@@ -1467,7 +1543,7 @@ type query_root {
   ): [accounts!]!
 
   """
-  fetch aggregated fields from the table: "accounts"
+  An aggregate relationship
   """
   accounts_aggregate(
     """
@@ -1989,9 +2065,17 @@ enum sessions_update_column {
   userId
 }
 
+input sessions_updates {
+  """
+  sets the columns of the filtered rows to the given values
+  """
+  _set: sessions_set_input
+  where: sessions_bool_exp!
+}
+
 type subscription_root {
   """
-  fetch data from the table: "accounts"
+  An array relationship
   """
   accounts(
     """
@@ -2021,7 +2105,7 @@ type subscription_root {
   ): [accounts!]!
 
   """
-  fetch aggregated fields from the table: "accounts"
+  An aggregate relationship
   """
   accounts_aggregate(
     """
@@ -2333,7 +2417,7 @@ columns and relationships of "users"
 """
 type users {
   """
-  fetch data from the table: "accounts"
+  An array relationship
   """
   accounts(
     """
@@ -2363,7 +2447,7 @@ type users {
   ): [accounts!]!
 
   """
-  fetch aggregated fields from the table: "accounts"
+  An aggregate relationship
   """
   accounts_aggregate(
     """
@@ -2775,6 +2859,14 @@ enum users_update_column {
   name
 }
 
+input users_updates {
+  """
+  sets the columns of the filtered rows to the given values
+  """
+  _set: users_set_input
+  where: users_bool_exp!
+}
+
 """
 columns and relationships of "verificationTokens"
 """
@@ -2891,4 +2983,12 @@ input verificationTokens_set_input {
   expires: timestamp
   identifier: String
   token: String
+}
+
+input verificationTokens_updates {
+  """
+  sets the columns of the filtered rows to the given values
+  """
+  _set: verificationTokens_set_input
+  where: verificationTokens_bool_exp!
 }

@@ -447,6 +447,14 @@ export const enum Accounts_Update_Column {
   UserId = 'userId',
 }
 
+export type Accounts_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Accounts_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Accounts_Set_Input>;
+  where: Accounts_Bool_Exp;
+};
+
 /** aggregate var_pop on columns */
 export type Accounts_Var_Pop_Fields = {
   __typename?: 'accounts_var_pop_fields';
@@ -527,20 +535,32 @@ export type Mutation_Root = {
   update_accounts?: Maybe<Accounts_Mutation_Response>;
   /** update single row of the table: "accounts" */
   update_accounts_by_pk?: Maybe<Accounts>;
+  /** update multiples rows of table: "accounts" */
+  update_accounts_many?: Maybe<Array<Maybe<Accounts_Mutation_Response>>>;
   /** update data of the table: "passwords" */
   update_passwords?: Maybe<Passwords_Mutation_Response>;
   /** update single row of the table: "passwords" */
   update_passwords_by_pk?: Maybe<Passwords>;
+  /** update multiples rows of table: "passwords" */
+  update_passwords_many?: Maybe<Array<Maybe<Passwords_Mutation_Response>>>;
   /** update data of the table: "sessions" */
   update_sessions?: Maybe<Sessions_Mutation_Response>;
   /** update single row of the table: "sessions" */
   update_sessions_by_pk?: Maybe<Sessions>;
+  /** update multiples rows of table: "sessions" */
+  update_sessions_many?: Maybe<Array<Maybe<Sessions_Mutation_Response>>>;
   /** update data of the table: "users" */
   update_users?: Maybe<Users_Mutation_Response>;
   /** update single row of the table: "users" */
   update_users_by_pk?: Maybe<Users>;
+  /** update multiples rows of table: "users" */
+  update_users_many?: Maybe<Array<Maybe<Users_Mutation_Response>>>;
   /** update data of the table: "verificationTokens" */
   update_verificationTokens?: Maybe<VerificationTokens_Mutation_Response>;
+  /** update multiples rows of table: "verificationTokens" */
+  update_verificationTokens_many?: Maybe<
+    Array<Maybe<VerificationTokens_Mutation_Response>>
+  >;
 };
 
 /** mutation root */
@@ -666,6 +686,11 @@ export type Mutation_RootUpdate_Accounts_By_PkArgs = {
 };
 
 /** mutation root */
+export type Mutation_RootUpdate_Accounts_ManyArgs = {
+  updates: Array<Accounts_Updates>;
+};
+
+/** mutation root */
 export type Mutation_RootUpdate_PasswordsArgs = {
   _inc?: InputMaybe<Passwords_Inc_Input>;
   _set?: InputMaybe<Passwords_Set_Input>;
@@ -677,6 +702,11 @@ export type Mutation_RootUpdate_Passwords_By_PkArgs = {
   _inc?: InputMaybe<Passwords_Inc_Input>;
   _set?: InputMaybe<Passwords_Set_Input>;
   pk_columns: Passwords_Pk_Columns_Input;
+};
+
+/** mutation root */
+export type Mutation_RootUpdate_Passwords_ManyArgs = {
+  updates: Array<Passwords_Updates>;
 };
 
 /** mutation root */
@@ -692,6 +722,11 @@ export type Mutation_RootUpdate_Sessions_By_PkArgs = {
 };
 
 /** mutation root */
+export type Mutation_RootUpdate_Sessions_ManyArgs = {
+  updates: Array<Sessions_Updates>;
+};
+
+/** mutation root */
 export type Mutation_RootUpdate_UsersArgs = {
   _set?: InputMaybe<Users_Set_Input>;
   where: Users_Bool_Exp;
@@ -704,9 +739,19 @@ export type Mutation_RootUpdate_Users_By_PkArgs = {
 };
 
 /** mutation root */
+export type Mutation_RootUpdate_Users_ManyArgs = {
+  updates: Array<Users_Updates>;
+};
+
+/** mutation root */
 export type Mutation_RootUpdate_VerificationTokensArgs = {
   _set?: InputMaybe<VerificationTokens_Set_Input>;
   where: VerificationTokens_Bool_Exp;
+};
+
+/** mutation root */
+export type Mutation_RootUpdate_VerificationTokens_ManyArgs = {
+  updates: Array<VerificationTokens_Updates>;
 };
 
 /** column ordering options */
@@ -991,6 +1036,14 @@ export const enum Passwords_Update_Column {
   UserId = 'userId',
 }
 
+export type Passwords_Updates = {
+  /** increments the numeric columns with given value of the filtered values */
+  _inc?: InputMaybe<Passwords_Inc_Input>;
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Passwords_Set_Input>;
+  where: Passwords_Bool_Exp;
+};
+
 /** aggregate var_pop on columns */
 export type Passwords_Var_Pop_Fields = {
   __typename?: 'passwords_var_pop_fields';
@@ -1032,9 +1085,9 @@ export type Passwords_Variance_Order_By = {
 
 export type Query_Root = {
   __typename?: 'query_root';
-  /** fetch data from the table: "accounts" */
+  /** An array relationship */
   accounts: Array<Accounts>;
-  /** fetch aggregated fields from the table: "accounts" */
+  /** An aggregate relationship */
   accounts_aggregate: Accounts_Aggregate;
   /** fetch data from the table: "accounts" using primary key columns */
   accounts_by_pk?: Maybe<Accounts>;
@@ -1338,11 +1391,17 @@ export const enum Sessions_Update_Column {
   UserId = 'userId',
 }
 
+export type Sessions_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Sessions_Set_Input>;
+  where: Sessions_Bool_Exp;
+};
+
 export type Subscription_Root = {
   __typename?: 'subscription_root';
-  /** fetch data from the table: "accounts" */
+  /** An array relationship */
   accounts: Array<Accounts>;
-  /** fetch aggregated fields from the table: "accounts" */
+  /** An aggregate relationship */
   accounts_aggregate: Accounts_Aggregate;
   /** fetch data from the table: "accounts" using primary key columns */
   accounts_by_pk?: Maybe<Accounts>;
@@ -1482,9 +1541,9 @@ export type Timestamp_Comparison_Exp = {
 /** columns and relationships of "users" */
 export type Users = {
   __typename?: 'users';
-  /** fetch data from the table: "accounts" */
+  /** An array relationship */
   accounts: Array<Accounts>;
-  /** fetch aggregated fields from the table: "accounts" */
+  /** An aggregate relationship */
   accounts_aggregate: Accounts_Aggregate;
   blocked: Scalars['Boolean'];
   email?: Maybe<Scalars['String']>;
@@ -1737,6 +1796,12 @@ export const enum Users_Update_Column {
   Name = 'name',
 }
 
+export type Users_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<Users_Set_Input>;
+  where: Users_Bool_Exp;
+};
+
 /** columns and relationships of "verificationTokens" */
 export type VerificationTokens = {
   __typename?: 'verificationTokens';
@@ -1830,6 +1895,12 @@ export type VerificationTokens_Set_Input = {
   expires?: InputMaybe<Scalars['timestamp']>;
   identifier?: InputMaybe<Scalars['String']>;
   token?: InputMaybe<Scalars['String']>;
+};
+
+export type VerificationTokens_Updates = {
+  /** sets the columns of the filtered rows to the given values */
+  _set?: InputMaybe<VerificationTokens_Set_Input>;
+  where: VerificationTokens_Bool_Exp;
 };
 
 export type DeleteAccountMutationVariables = Exact<{

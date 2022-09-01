@@ -46,9 +46,9 @@
           "clean"
         ],
         "parallel": true,
-        "accessToken": "TODO: YOUR_READ_ACCESS_TOKEN: https://nx.dev/nx-cloud/account/access-tokens",
         "canTrackAnalytics": true,
-        "showUsageWarning": true
+        "showUsageWarning": true,
+        "accessToken": "MjY3YTZiYjctY2U3MC00M2I5LTg5NWItMjg4Njk4NmI0MTE2fHJlYWQtd3JpdGU="
       }
     }
   },

@@ -137,6 +137,16 @@ type mutation_root {
     _set: users_set_input
     pk_columns: users_pk_columns_input!
   ): users
+
+  """
+  update multiples rows of table: "users"
+  """
+  update_users_many(
+    """
+    updates to execute, in order
+    """
+    updates: [users_updates!]!
+  ): [users_mutation_response]
 }
 
 """
@@ -380,4 +390,12 @@ input users_set_input {
   id: String
   image: String
   name: String
+}
+
+input users_updates {
+  """
+  sets the columns of the filtered rows to the given values
+  """
+  _set: users_set_input
+  where: users_bool_exp!
 }
