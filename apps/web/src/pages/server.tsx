@@ -1,6 +1,5 @@
 import type { NextPageContext } from 'next';
 import { getSession, useSession } from 'next-auth/react';
-import { useGetUserQuery } from '@boilerplate/gql-user';
 import React, { useState } from 'react';
 
 export default function ServerSidePage() {
@@ -11,8 +10,6 @@ export default function ServerSidePage() {
   // const loading = status === 'loading'
 
   const { data, status } = useSession();
-  const [showPassword, setShowPassword] = useState(false);
-  // const { status, data, error, isFetching } = useGetUserQuery(,{})
   console.log({ session: data, loading: status });
   return (
     <div>
