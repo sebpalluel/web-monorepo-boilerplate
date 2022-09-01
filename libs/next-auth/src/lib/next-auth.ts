@@ -10,6 +10,7 @@ import { adapter } from '@boilerplate/hasura-adapter';
 import { Roles } from '@boilerplate/hasura-utils';
 import { fetchJSON } from '@boilerplate/utils';
 import { logger } from '@boilerplate/logger';
+import { Provider } from 'next-auth/providers';
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -35,41 +36,39 @@ const refreshAccessToken = async (token: JWT) => {
       //     refreshToken: data.refreshToken?.token ?? token.refreshToken,
       //     exp: (data.accessToken?.expirationDate || 0) / 1000
       // }
-    } else {
-      if (token.provider === 'google') {
-        const url =
-          'https://oauth2.googleapis.com/token?' +
-          new URLSearchParams({
-            client_id: process.env.GOOGLE_CLIENT_ID as string,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
-            grant_type: 'refresh_token',
-            refresh_token: token.refreshToken as string,
-          });
-
-        const response = await fetch(url, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          method: 'POST',
+    } else if (token.provider === 'google') {
+      const url =
+        'https://oauth2.googleapis.com/token?' +
+        new URLSearchParams({
+          client_id: process.env.GOOGLE_CLIENT_ID as string,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET as string,
+          grant_type: 'refresh_token',
+          refresh_token: token.refreshToken as string,
         });
 
-        const refreshedTokens = await response.json();
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+      });
 
-        logger.debug('refreshed tokens', { refreshedTokens });
+      const refreshedTokens = await response.json();
 
-        if (!response.ok) {
-          throw refreshedTokens;
-        }
+      logger.debug('refreshed tokens', { refreshedTokens });
 
-        return {
-          ...token,
-          accessToken: refreshedTokens.access_token,
-          accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-          refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
-        };
+      if (!response.ok) {
+        throw refreshedTokens;
       }
-      return token;
+
+      return {
+        ...token,
+        accessToken: refreshedTokens.access_token,
+        accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+        refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Fall back to old refresh token
+      };
     }
+    return token;
   } catch (error) {
     return { ...token, error: 'RefreshAccessTokenError' };
   }
@@ -103,76 +102,74 @@ const GOOGLE_AUTHORIZATION_URL =
     response_type: 'code',
   });
 
-export const authOptions: NextAuthOptions = {
-  debug: true,
-  // https://next-auth.js.org/configuration/providers/oauth
-  providers: [
+const providers: Array<Provider> = [
+  CredentialsProvider({
+    // The name to display on the sign in form (e.g. 'Sign in with...')
+    id: 'credentials',
+    name: 'credentials',
+    // The credentials is used to generate a suitable form on the sign in page.
+    // You can specify whatever fields you are expecting to be submitted.
+    // e.g. domain, username, password, 2FA token, etc.
+    // You can pass any HTML attribute to the <input> tag through the object.
+    credentials: {
+      username: {
+        label: 'Username',
+        type: 'text',
+        placeholder: 'myemail@domain.com',
+      },
+      password: { label: 'Password', type: 'password' },
+    },
+    authorize: async (credentials) => {
+      try {
+        const user = await fetchJSON(
+          `${process.env.NEXTAUTH_URL}/api/user/check-credentials`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              accept: 'application/json',
+            },
+            body: Object.entries({
+              username: credentials?.username,
+              password: credentials?.password,
+            })
+              .map((e) => e.join('='))
+              .join('&'),
+          }
+        );
+        logger.debug(user);
+        if (user) {
+          return user;
+        } else {
+          return null;
+        }
+      } catch (e) {
+        return null;
+      }
+    },
+  }),
+];
+
+if (process.env.GITHUB_ID && process.env.GITHUB_SECRET)
+  providers.push(
     GithubProvider({
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
-    }),
+    })
+  );
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+  providers.push(
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: GOOGLE_AUTHORIZATION_URL,
-    }),
-    // https://next-auth.js.org/configuration/providers/email
-    // EmailProvider({
-    //     server: {
-    //         host: process.env.EMAIL_SERVER_HOST,
-    //         port: process.env.EMAIL_SERVER_PORT,
-    //         auth: {
-    //             user: process.env.EMAIL_SERVER_USER,
-    //             pass: process.env.EMAIL_SERVER_PASSWORD
-    //         }
-    //     },
-    //     from: process.env.EMAIL_FROM
-    // }),
-    CredentialsProvider({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
-      id: 'credentials',
-      name: 'credentials',
-      // The credentials is used to generate a suitable form on the sign in page.
-      // You can specify whatever fields you are expecting to be submitted.
-      // e.g. domain, username, password, 2FA token, etc.
-      // You can pass any HTML attribute to the <input> tag through the object.
-      credentials: {
-        username: {
-          label: 'Username',
-          type: 'text',
-          placeholder: 'jsmith',
-        },
-        password: { label: 'Password', type: 'password' },
-      },
-      authorize: async (credentials) => {
-        try {
-          const user = await fetchJSON(
-            `${process.env.NEXTAUTH_URL}/api/user/check-credentials`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                accept: 'application/json',
-              },
-              body: Object.entries({
-                username: credentials?.username,
-                password: credentials?.password,
-              })
-                .map((e) => e.join('='))
-                .join('&'),
-            }
-          );
-          if (user) {
-            return user;
-          } else {
-            return null;
-          }
-        } catch (e) {
-          return null;
-        }
-      },
-    }),
-  ],
+    })
+  );
+
+export const authOptions: NextAuthOptions = {
+  debug: process.env.NODE_ENV !== 'production',
+  // https://next-auth.js.org/configuration/providers/oauth
+  providers,
   adapter: adapter(),
   pages: {
     signIn: '/auth/signin',
